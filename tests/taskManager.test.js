@@ -4,7 +4,9 @@ const {
   deleteTask,
   clearCompleted,
   getActiveCount,
-  filterTasks
+  filterTasks,
+  isOverdue,
+  formatDueDate
 } = require('../src/taskManager');
 
 // ── addTask ─────────────────────────────────────────────────────────────────
@@ -175,5 +177,48 @@ describe('filterTasks', () => {
 
   test('unknown filter defaults to returning all tasks', () => {
     expect(filterTasks(tasks, 'unknown')).toHaveLength(3);
+  });
+});
+
+// ── due dates ────────────────────────────────────────────────────────────────
+
+describe('due dates', () => {
+  test('addTask stores an optional due date as an ISO date string', () => {
+    const tasks = addTask([], 'Pay rent', 'high', '2026-09-20');
+    expect(tasks[0].dueDate).toBe('2026-09-20');
+  });
+
+  test('addTask defaults dueDate to null when none is given', () => {
+    expect(addTask([], 'Task 1')[0].dueDate).toBeNull();
+    expect(addTask([], 'Task 1', 'medium', '')[0].dueDate).toBeNull();
+  });
+
+  test('toggleTask preserves the due date', () => {
+    let tasks = addTask([], 'Task 1', 'medium', '2026-09-20');
+    tasks = toggleTask(tasks, tasks[0].id);
+    expect(tasks[0].dueDate).toBe('2026-09-20');
+  });
+
+  test('isOverdue is true only when the due date is before today', () => {
+    const today = '2026-10-25';
+    expect(isOverdue(addTask([], 'A', 'medium', '2026-10-24')[0], today)).toBe(true);
+    expect(isOverdue(addTask([], 'B', 'medium', '2026-10-25')[0], today)).toBe(false);
+    expect(isOverdue(addTask([], 'C', 'medium', '2026-10-26')[0], today)).toBe(false);
+  });
+
+  test('isOverdue is false for tasks without a due date', () => {
+    expect(isOverdue(addTask([], 'Task 1')[0], '2026-10-25')).toBe(false);
+  });
+
+  test('isOverdue is false for completed tasks', () => {
+    let tasks = addTask([], 'Task 1', 'medium', '2020-01-01');
+    tasks = toggleTask(tasks, tasks[0].id);
+    expect(isOverdue(tasks[0], '2026-10-25')).toBe(false);
+  });
+
+  test('formatDueDate renders a short month and day', () => {
+    expect(formatDueDate('2026-09-20')).toBe('Due: Sep 20');
+    expect(formatDueDate('2026-01-05')).toBe('Due: Jan 5');
+    expect(formatDueDate('2026-12-31')).toBe('Due: Dec 31');
   });
 });

@@ -89,6 +89,23 @@ body {
   color: var(--color-muted);
 }
 
+.due-date-input {
+  padding: 0 10px;
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  font-size: 0.9rem;
+  font-family: inherit;
+  color: var(--color-text);
+  background: var(--color-card);
+  transition: border-color var(--transition), box-shadow var(--transition);
+  outline: none;
+}
+
+.due-date-input:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+}
+
 .add-btn {
   padding: 12px 20px;
   background: var(--color-primary);
@@ -168,6 +185,23 @@ body {
 .task-item.completed .task-text {
   text-decoration: line-through;
   color: var(--color-completed);
+}
+
+.task-item.overdue {
+  box-shadow: inset 3px 0 0 var(--color-danger);
+}
+
+.task-item.overdue .task-text,
+.task-item.overdue .due-date {
+  color: var(--color-danger);
+}
+
+/* ── Due date ── */
+.due-date {
+  font-size: 0.8rem;
+  color: var(--color-muted);
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 /* ── Checkbox ── */
@@ -306,6 +340,19 @@ body {
 @media (max-width: 480px) {
   .app-header h1 {
     font-size: 1.8rem;
+  }
+
+  .add-task-form {
+    flex-wrap: wrap;
+  }
+
+  .task-input {
+    flex-basis: 100%;
+  }
+
+  .due-date-input {
+    flex: 1;
+    padding: 10px;
   }
 
   .task-footer {

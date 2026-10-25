@@ -9,6 +9,7 @@
   };
 
   var taskInput = document.getElementById('taskInput');
+  var dueDateInput = document.getElementById('dueDateInput');
   var addTaskForm = document.getElementById('addTaskForm');
   var taskList = document.getElementById('taskList');
   var taskCount = document.getElementById('taskCount');
@@ -22,7 +23,8 @@
     taskList.innerHTML = '';
     visible.forEach(function (task) {
       var li = document.createElement('li');
-      li.className = 'task-item' + (task.completed ? ' completed' : '');
+      li.className = 'task-item' + (task.completed ? ' completed' : '') +
+        (TM.isOverdue(task) ? ' overdue' : '');
       li.dataset.id = task.id;
 
       var checkbox = document.createElement('input');
@@ -53,6 +55,12 @@
 
       li.appendChild(checkbox);
       li.appendChild(label);
+      if (task.dueDate) {
+        var dueLabel = document.createElement('span');
+        dueLabel.className = 'due-date';
+        dueLabel.textContent = TM.formatDueDate(task.dueDate);
+        li.appendChild(dueLabel);
+      }
       li.appendChild(priorityBadge);
       li.appendChild(deleteBtn);
       taskList.appendChild(li);
@@ -75,8 +83,9 @@
     var priority = prioritySelect ? prioritySelect.value : 'medium';
 
     try {
-      state.tasks = TM.addTask(state.tasks, text, priority);
+      state.tasks = TM.addTask(state.tasks, text, priority, dueDateInput.value);
       taskInput.value = '';
+      dueDateInput.value = '';
       taskInput.focus();
       render();
     } catch (e) {
